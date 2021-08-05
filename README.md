@@ -1,7 +1,7 @@
 # 🔑 Yandex.Key Extractor
 ## 🇺🇸 Extracts TOTP authenticators from [Yandex.Key](https://play.google.com/store/apps/details?id=ru.yandex.key&hl=en&gl=US) app
 
-## How to use?
+### How to use?
 1. Create a cloud backup in the app settings using your device.
 2. Launch **YandexKeyExtractor**.
 3. Enter the same phone number you've used in the first step.
@@ -11,8 +11,7 @@
 ---
 ## 🇷🇺 Извлечение двухфакторных аутентификаторов из [Яндекс.Ключ](https://play.google.com/store/apps/details?id=ru.yandex.key&hl=ru&gl=RU) 🔑
 
-
-## Как использовать?
+### Как использовать?
 1. Создайте облачную резервную копию в настройках приложения с вашего устройства.
 2. Откройте **YandexKeyExtractor**.
 3. Введите номер телефона, что вы вводили в первом шаге.
