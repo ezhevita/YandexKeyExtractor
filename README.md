@@ -9,7 +9,7 @@
 4. TOTP links will be saved in `results.txt`.<br>Use QR code generator to import to another TOTP app or just extract secrets (e.g. for [Bitwarden](https://bitwarden.com/) import).
 
 ---
-## 🇷🇺 Извлечение двухфакторных аутентификаторов из [Яндекс.Ключ](https://play.google.com/store/apps/details?id=ru.yandex.key&hl=ru&gl=RU) 🔑
+## 🇷🇺 Извлечение двухфакторных аутентификаторов из [Яндекс.Ключ](https://play.google.com/store/apps/details?id=ru.yandex.key&hl=ru&gl=RU)
 
 ### Как использовать?
 1. Создайте облачную резервную копию в настройках приложения с вашего устройства.
