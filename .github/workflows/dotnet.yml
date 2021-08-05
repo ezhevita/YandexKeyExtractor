@@ -1,0 +1,27 @@
+name: .NET
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+env:
+  DOTNET_SDK_VERSION: 5.0.x
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: ${{ env.DOTNET_SDK_VERSION }}
+    - name: Publish
+      run: dotnet publish -c Release -o out --no-restore
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v2
+      with: 
+        name: ${{ github.event.repository.name }}
+        path: out
