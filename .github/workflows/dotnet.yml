@@ -19,7 +19,7 @@ jobs:
       with:
         dotnet-version: ${{ env.DOTNET_SDK_VERSION }}
     - name: Publish
-      run: dotnet publish -c Release -o out --no-restore
+      run: dotnet publish -c Release -o out
     - name: Upload artifacts
       uses: actions/upload-artifact@v2
       with: 
