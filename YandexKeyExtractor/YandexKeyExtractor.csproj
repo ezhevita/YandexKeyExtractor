@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<LangVersion>preview</LangVersion>
+		<TargetFramework>net6.0</TargetFramework>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="ConfigureAwaitChecker.Analyzer" Version="5.0.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="CryptSharpStandard" Version="1.0.0" />
+		<PackageReference Include="Flurl.Http" Version="3.2.0" />
+		<PackageReference Include="Flurl.Serialization.TextJson" Version="3.0.0" />
+		<PackageReference Include="NaCl.Net" Version="0.1.13" />
+	</ItemGroup>
+
+</Project>
