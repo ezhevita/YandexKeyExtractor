@@ -18,10 +18,17 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: ${{ env.DOTNET_SDK_VERSION }}
-    - name: Publish
-      run: dotnet publish -c Release -o out
-    - name: Upload artifacts
+    - name: Publish generic
+      run: dotnet publish -c Release -o out/generic -p:UseAppHost=false
+    - name: Upload generic artifacts
       uses: actions/upload-artifact@v2
       with: 
         name: ${{ github.event.repository.name }}
-        path: out
+        path: out/generic
+    - name: Publish Windows version
+      run: dotnet publish -c Release -o out/win -p:PublishSingleFile=true -p:PublishTrimmed=true -r win-x64
+    - name: Upload Windows artifacts
+      uses: actions/upload-artifact@v2
+      with: 
+        name: ${{ github.event.repository.name }}-Windows
+        path: out/win
