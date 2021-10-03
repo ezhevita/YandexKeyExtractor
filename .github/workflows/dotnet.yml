@@ -32,3 +32,68 @@ jobs:
       with: 
         name: ${{ github.event.repository.name }}-Windows
         path: out/win
+
+  release:
+    if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') }}
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download generic artifacts
+        uses: actions/download-artifact@v2.0.10
+        with:
+          name: ${{ github.event.repository.name }}
+          path: out/${{ github.event.repository.name }}
+
+      - name: Download Windows artifacts
+        uses: actions/download-artifact@v2.0.10
+        with:
+          name: ${{ github.event.repository.name }}-Windows
+          path: out/${{ github.event.repository.name }}-Windows
+
+      - name: Archive generic release
+        uses: thedoctor0/zip-release@master
+        with:
+          directory: out
+          path: ${{ github.event.repository.name }}
+          type: 'zip'
+          filename: 'generic.zip'
+          exclusions: '*.json'
+
+      - name: Archive Windows release
+        uses: thedoctor0/zip-release@master
+        with:
+          directory: out
+          path: ${{ github.event.repository.name }}-Windows
+          type: 'zip'
+          filename: 'Windows.zip'
+          exclusions: '*.json'
+
+      - name: Create GitHub release
+        id: github_release
+        uses: actions/create-release@v1.1.4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: ${{ github.event.repository.name }} V${{ github.ref }}
+
+      - name: Upload generic artifacts to GitHub release
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.github_release.outputs.upload_url }}
+          asset_path: out/generic.zip
+          asset_name: generic.zip
+          asset_content_type: application/zip
+
+      - name: Upload Windows artifacts to GitHub release
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.github_release.outputs.upload_url }}
+          asset_path: out/Windows.zip
+          asset_name: Windows.zip
+          asset_content_type: application/zip
