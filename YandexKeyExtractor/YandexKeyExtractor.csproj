@@ -24,7 +24,7 @@
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="CryptSharpStandard" Version="1.0.0" />
-		<PackageReference Include="Flurl.Http" Version="3.2.1" />
+		<PackageReference Include="Flurl.Http" Version="3.2.2" />
 		<PackageReference Include="Flurl.Serialization.TextJson" Version="3.1.0" />
 		<PackageReference Include="NaCl.Net" Version="0.1.13" />
 	</ItemGroup>
