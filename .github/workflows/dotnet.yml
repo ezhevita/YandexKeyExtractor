@@ -17,14 +17,14 @@ jobs:
     - name: Publish generic
       run: dotnet publish -c Release -o out/generic -p:UseAppHost=false
     - name: Upload generic artifacts
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with: 
         name: ${{ github.event.repository.name }}
         path: out/generic
     - name: Publish Windows version
       run: dotnet publish -c Release -o out/win -p:PublishSingleFile=true -p:PublishTrimmed=true -r win-x64
     - name: Upload Windows artifacts
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with: 
         name: ${{ github.event.repository.name }}-Windows
         path: out/win
