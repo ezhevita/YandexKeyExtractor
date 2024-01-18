@@ -1,27 +1,27 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-	<PropertyGroup>
-		<AssemblyVersion>1.0.0.0</AssemblyVersion>
-		<FileVersion>1.0.0.0</FileVersion>
-		<Nullable>enable</Nullable>
-		<OutputType>Exe</OutputType>
-		<TargetFramework>net8.0</TargetFramework>
-	</PropertyGroup>
+    <PropertyGroup>
+        <AssemblyVersion>1.0.0.0</AssemblyVersion>
+        <FileVersion>1.0.0.0</FileVersion>
+        <Nullable>enable</Nullable>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net8.0</TargetFramework>
+    </PropertyGroup>
 
-	<!-- Trimming features -->
-	<PropertyGroup Condition="'$(Configuration)' == 'Release'">
-		<DebuggerSupport>false</DebuggerSupport>
-		<EnableUnsafeBinaryFormatterSerialization>false</EnableUnsafeBinaryFormatterSerialization>
-		<EnableUnsafeUTF7Encoding>false</EnableUnsafeUTF7Encoding>
-		<EventSourceSupport>false</EventSourceSupport>
-		<HttpActivityPropagationSupport>false</HttpActivityPropagationSupport>
-		<TrimMode>link</TrimMode>
-	</PropertyGroup>
+    <!-- Trimming features -->
+    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+        <DebuggerSupport>false</DebuggerSupport>
+        <EnableUnsafeBinaryFormatterSerialization>false</EnableUnsafeBinaryFormatterSerialization>
+        <EnableUnsafeUTF7Encoding>false</EnableUnsafeUTF7Encoding>
+        <EventSourceSupport>false</EventSourceSupport>
+        <HttpActivityPropagationSupport>false</HttpActivityPropagationSupport>
+        <TrimMode>link</TrimMode>
+    </PropertyGroup>
 
-	<ItemGroup>
-		<PackageReference Include="CryptSharpStandard" Version="1.0.0" />
-		<PackageReference Include="Flurl.Http" Version="4.0.2" />
-		<PackageReference Include="NaCl.Net" Version="0.1.13" />
-	</ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="CryptSharpStandard" Version="1.0.0"/>
+        <PackageReference Include="Flurl.Http" Version="4.0.2"/>
+        <PackageReference Include="NaCl.Net" Version="0.1.13"/>
+    </ItemGroup>
 
 </Project>

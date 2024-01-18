@@ -1,13 +1,14 @@
 using System.Text.Json.Serialization;
 
-namespace YandexKeyExtractor.Models {
-	public class StatusResponse {
-		[JsonPropertyName("status")]
-		public string? Status { get; set; }
+namespace YandexKeyExtractor.Models;
 
-		[JsonPropertyName("errors")]
-		public string[]? Errors { get; set; }
+public class StatusResponse
+{
+	[JsonPropertyName("status")]
+	public string? Status { get; set; }
 
-		public bool IsSuccess => Status == "ok";
-	}
+	[JsonPropertyName("errors")]
+	public string[]? Errors { get; set; }
+
+	public bool IsSuccess => Status == "ok";
 }
