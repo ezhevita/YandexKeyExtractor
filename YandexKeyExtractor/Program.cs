@@ -1,65 +1,61 @@
 ﻿using System;
 using System.IO;
 using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
+using YandexKeyExtractor;
 
-namespace YandexKeyExtractor {
-	internal static class Program {
-		private static async Task Main() {
-			Console.WriteLine("Initializing...");
-			using WebHandler handler = WebHandler.Create();
+Console.WriteLine("Initializing...");
+using var handler = WebHandler.Create();
 
-			string country = await handler.TryGetCountry().ConfigureAwait(false);
+var country = await handler.TryGetCountry();
 
-			PromptInput(out string phoneNumber, nameof(phoneNumber));
+PromptInput(out var phoneNumber);
 
-			phoneNumber = phoneNumber.TrimStart('+');
-			string phone = await handler.GetPhoneNumberInfo(phoneNumber, country).ConfigureAwait(false);
+phoneNumber = phoneNumber.TrimStart('+');
+var phone = await handler.GetPhoneNumberInfo(phoneNumber, country);
 
-			string? trackID = await handler.SendSMSCodeAndGetTrackID(phone, country).ConfigureAwait(false);
-			if (string.IsNullOrEmpty(trackID)) {
-				return;
-			}
+var trackID = await handler.SendSMSCodeAndGetTrackID(phone, country);
+if (string.IsNullOrEmpty(trackID)) {
+	return;
+}
 
-			PromptInput(out string smsCode, nameof(smsCode));
+PromptInput(out var smsCode);
 
-			if (!await handler.CheckCode(smsCode, trackID).ConfigureAwait(false)) {
-				return;
-			}
+if (!await handler.CheckCode(smsCode, trackID)) {
+	return;
+}
 
-			if (!await handler.ValidateBackupInfo(phone, trackID, country).ConfigureAwait(false)) {
-				return;
-			}
+if (!await handler.ValidateBackupInfo(phone, trackID, country)) {
+	return;
+}
 
-			string? backup = await handler.GetBackupData(phone, trackID).ConfigureAwait(false);
-			if (string.IsNullOrEmpty(backup)) {
-				return;
-			}
+var backup = await handler.GetBackupData(phone, trackID);
+if (string.IsNullOrEmpty(backup)) {
+	return;
+}
 
-			PromptInput(out string backupPassword, nameof(backupPassword));
+PromptInput(out var backupPassword);
 
-			Console.WriteLine("Decrypting...");
-			string? message = Decryptor.Decrypt(backup, backupPassword);
-			if (string.IsNullOrEmpty(message)) {
-				Console.WriteLine("Decryption failed!");
+Console.WriteLine("Decrypting...");
+var message = Decryptor.Decrypt(backup, backupPassword);
+if (string.IsNullOrEmpty(message)) {
+	Console.WriteLine("Decryption failed!");
 
-				return;
-			}
+	return;
+}
 
-			Console.WriteLine("Successfully decrypted!");
-			await File.WriteAllTextAsync("result.txt", message).ConfigureAwait(false);
-			Console.WriteLine($"Written {message.Split('\n').Length} authenticators to result file");
-		}
+Console.WriteLine("Successfully decrypted!");
+await File.WriteAllTextAsync("result.txt", message);
+Console.WriteLine($"Written {message.Split('\n').Length} authenticators to result file");
 
-		private static void PromptInput(out string result, [CallerArgumentExpression("result")] string argumentName = "") {
-			Console.WriteLine($"Enter {argumentName}:");
-			string? input = Console.ReadLine();
-			while (string.IsNullOrEmpty(input)) {
-				Console.WriteLine($"{argumentName} is invalid, try again:");
-				input = Console.ReadLine();
-			}
+return;
 
-			result = input;
-		}
+static void PromptInput(out string result, [CallerArgumentExpression("result")] string argumentName = "") {
+	Console.WriteLine($"Enter {argumentName}:");
+	var input = Console.ReadLine();
+	while (string.IsNullOrEmpty(input)) {
+		Console.WriteLine($"{argumentName} is invalid, try again:");
+		input = Console.ReadLine();
 	}
+
+	result = input;
 }

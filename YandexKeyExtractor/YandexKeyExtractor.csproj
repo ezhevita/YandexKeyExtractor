@@ -5,9 +5,9 @@
 		<FileVersion>1.0.0.0</FileVersion>
 		<Nullable>enable</Nullable>
 		<OutputType>Exe</OutputType>
-		<TargetFramework>net6.0</TargetFramework>
+		<TargetFramework>net8.0</TargetFramework>
 	</PropertyGroup>
- 
+
 	<!-- Trimming features -->
 	<PropertyGroup Condition="'$(Configuration)' == 'Release'">
 		<DebuggerSupport>false</DebuggerSupport>
@@ -19,10 +19,6 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="ConfigureAwaitChecker.Analyzer" Version="5.0.0.1">
-			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
 		<PackageReference Include="CryptSharpStandard" Version="1.0.0" />
 		<PackageReference Include="Flurl.Http" Version="3.2.4" />
 		<PackageReference Include="Flurl.Serialization.TextJson" Version="3.1.0" />

@@ -15,17 +15,17 @@ jobs:
       with:
         dotnet-version: ${{ env.DOTNET_SDK_VERSION }}
     - name: Publish generic
-      run: dotnet publish -c Release -o out/generic -p:UseAppHost=false
+      run: dotnet publish YandexKeyExtractor/YandexKeyExtractor.csproj -c Release -o out/generic -p:UseAppHost=false
     - name: Upload generic artifacts
       uses: actions/upload-artifact@v4
-      with: 
+      with:
         name: ${{ github.event.repository.name }}
         path: out/generic
     - name: Publish Windows version
-      run: dotnet publish -c Release -o out/win -p:PublishSingleFile=true -p:PublishTrimmed=true -r win-x64
+      run: dotnet publish YandexKeyExtractor/YandexKeyExtractor.csproj -c Release -o out/win -p:PublishSingleFile=true -p:PublishTrimmed=true -r win-x64
     - name: Upload Windows artifacts
       uses: actions/upload-artifact@v4
-      with: 
+      with:
         name: ${{ github.event.repository.name }}-Windows
         path: out/win
 
