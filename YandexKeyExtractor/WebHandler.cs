@@ -8,7 +8,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Flurl.Http;
-using Flurl.Serialization.TextJson;
+using Flurl.Http.Configuration;
 using YandexKeyExtractor.Models;
 
 namespace YandexKeyExtractor;
@@ -50,8 +50,9 @@ public sealed class WebHandler : IDisposable
 			{
 				DefaultRequestHeaders = {UserAgent = {new ProductInfoHeaderValue("okhttp", "2.7.5")}},
 				BaseAddress = new Uri("https://registrator.mobile.yandex.net/1/")
-			}
-		).Configure(settings => settings.WithTextJsonSerializer(jsonSettings));
+			});
+
+		client.Settings.JsonSerializer = new DefaultJsonSerializer(jsonSettings);
 
 		return new WebHandler(client);
 	}
@@ -91,8 +92,8 @@ public sealed class WebHandler : IDisposable
 				{
 					phone_number = phoneNumber,
 					country
-				}
-			).ReceiveJson<PhoneNumberResponse?>();
+				})
+			.ReceiveJson<PhoneNumberResponse?>();
 
 		ValidateResponse(phoneNumberResponse, nameof(phoneNumberResponse));
 
@@ -110,8 +111,7 @@ public sealed class WebHandler : IDisposable
 					display_language = "en",
 					number = phone,
 					country
-				}
-			)
+				})
 			.ReceiveJson<TrackResponse?>();
 
 		if (!ValidateResponse(trackResponse, nameof(trackResponse)))
@@ -152,8 +152,7 @@ public sealed class WebHandler : IDisposable
 					number = phone,
 					track_id = trackID,
 					country
-				}
-			)
+				})
 			.ReceiveJson<BackupInfoResponse?>();
 
 		if (!ValidateResponse(backupInfoResponse, nameof(backupInfoResponse)))
