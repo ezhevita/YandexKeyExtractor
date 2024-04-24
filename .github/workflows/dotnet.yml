@@ -36,13 +36,13 @@ jobs:
 
     steps:
       - name: Download generic artifacts
-        uses: actions/download-artifact@v4.1.6
+        uses: actions/download-artifact@v4.1.7
         with:
           name: ${{ github.event.repository.name }}
           path: out/${{ github.event.repository.name }}
 
       - name: Download Windows artifacts
-        uses: actions/download-artifact@v4.1.6
+        uses: actions/download-artifact@v4.1.7
         with:
           name: ${{ github.event.repository.name }}-Windows
           path: out/${{ github.event.repository.name }}-Windows
