@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<root>
+    <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+        <xsd:element name="root" msdata:IsDataSet="true">
+
+        </xsd:element>
+    </xsd:schema>
+    <resheader name="resmimetype">
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name="version">
+        <value>1.3</value>
+    </resheader>
+    <resheader name="reader">
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+    <resheader name="writer">
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+    <data name="Initializing" xml:space="preserve">
+        <value>Загрузка...</value>
+    </data>
+    <data name="PhoneNumberVariableName" xml:space="preserve">
+        <value>Номер телефона</value>
+    </data>
+    <data name="PromptVariable" xml:space="preserve">
+        <value>Введите {0}:</value>
+    </data>
+    <data name="InvalidVariableValue" xml:space="preserve">
+        <value>{0} неверен, попробуйте ещё раз:</value>
+    </data>
+    <data name="SmsCodeVariableName" xml:space="preserve">
+        <value>Код из SMS</value>
+    </data>
+    <data name="BackupPasswordVariableName" xml:space="preserve">
+        <value>Пароль резервной копии</value>
+    </data>
+    <data name="Decrypting" xml:space="preserve">
+        <value>Дешифрование...</value>
+    </data>
+    <data name="DecryptionFailed" xml:space="preserve">
+        <value>Дешифрование не удалось! Скорее всего, был введён неправильный пароль.</value>
+    </data>
+    <data name="Success" xml:space="preserve">
+        <value>Успех! Записано {0} данных аутентификаторов в файл (result.txt).</value>
+    </data>
+    <data name="NoValidBackup" xml:space="preserve">
+        <value>Не получилось найти действительную резервную копию!</value>
+    </data>
+    <data name="ResponseFailed" xml:space="preserve">
+        <value>Получена ошибка при запросе {0}.</value>
+    </data>
+    <data name="ResponseFailedWithDetails" xml:space="preserve">
+        <value>Получен код ошибки '{0} при запросе {1}, ошибки: {2}.</value>
+    </data>
+    <data name="UnknownErrorOccurred" xml:space="preserve">
+        <value>Произошла неизвестная ошибка: {0}.</value>
+    </data>
+</root>

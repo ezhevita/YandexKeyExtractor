@@ -1,197 +1,130 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using Flurl.Http;
-using Flurl.Http.Configuration;
+using YandexKeyExtractor.Exceptions;
 using YandexKeyExtractor.Models;
 
 namespace YandexKeyExtractor;
 
 public sealed class WebHandler : IDisposable
 {
-	private WebHandler(IFlurlClient client) => Client = client;
-	private IFlurlClient Client { get; }
-
-	public void Dispose()
+	private readonly HttpClient _client = new()
 	{
-		Client.Dispose();
+		DefaultRequestHeaders = {UserAgent = {new ProductInfoHeaderValue("okhttp", "2.7.5")}},
+		BaseAddress = new Uri("https://registrator.mobile.yandex.net/1/")
+	};
+
+	private readonly JsonSerializerOptions _jsonSettings = new()
+	{
+		TypeInfoResolver = SourceGenerationContext.Default
+	};
+
+	public async Task CheckCode(string smsCode, string trackID)
+	{
+		var checkCodeResponse = await PostUrlEncodedAndReceiveJson<StatusResponse>(
+			new Uri("bundle/yakey_backup/check_code/", UriKind.Relative),
+			new Dictionary<string, string>(2) {["code"] = smsCode, ["track_id"] = trackID});
+
+		ValidateResponse(checkCodeResponse);
 	}
 
-	public async Task<bool> CheckCode(string? smsCode, string? trackID)
+	public async Task<string> GetBackupData(string phone, string trackID)
 	{
-		var checkCodeResponse = await Client.Request("/bundle/yakey_backup/check_code/")
-			.PostUrlEncodedAsync(
-				new
-				{
-					code = smsCode,
-					track_id = trackID
-				}
-			)
-			.ReceiveJson<StatusResponse?>();
+		var backupResponse = await PostUrlEncodedAndReceiveJson<BackupResponse>(
+			new Uri("bundle/yakey_backup/download", UriKind.Relative),
+			new Dictionary<string, string>(2) {["number"] = phone, ["track_id"] = trackID});
 
-		return ValidateResponse(checkCodeResponse, nameof(checkCodeResponse));
-	}
-
-	public static WebHandler Create()
-	{
-		JsonSerializerOptions jsonSettings = new()
-		{
-			DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-		};
-
-		var client = new FlurlClient(
-			new HttpClient
-			{
-				DefaultRequestHeaders = {UserAgent = {new ProductInfoHeaderValue("okhttp", "2.7.5")}},
-				BaseAddress = new Uri("https://registrator.mobile.yandex.net/1/")
-			});
-
-		client.Settings.JsonSerializer = new DefaultJsonSerializer(jsonSettings);
-
-		return new WebHandler(client);
-	}
-
-	public async Task<string?> GetBackupData(string phone, string? trackID)
-	{
-		var backupResponse = await Client.Request("/bundle/yakey_backup/download")
-			.PostUrlEncodedAsync(
-				new
-				{
-					number = phone,
-					track_id = trackID
-				}
-			)
-			.ReceiveJson<BackupResponse?>();
-
-		if (!ValidateResponse(backupResponse, nameof(backupResponse)))
-		{
-			return null;
-		}
+		ValidateResponse(backupResponse);
 
 		if (string.IsNullOrEmpty(backupResponse.Backup))
 		{
-			Console.WriteLine("Fatal error - Couldn't find valid backup!");
-
-			return null;
+			throw new NoValidBackupException();
 		}
 
 		return backupResponse.Backup;
 	}
 
-	public async Task<string> GetPhoneNumberInfo(string? phoneNumber, string country)
+	public async Task<string> GetPhoneNumberInfo(string phoneNumber, string country)
 	{
-		var phoneNumberResponse = await Client.Request("/bundle/validate/phone_number/")
-			.PostUrlEncodedAsync(
-				new
-				{
-					phone_number = phoneNumber,
-					country
-				})
-			.ReceiveJson<PhoneNumberResponse?>();
+		var phoneNumberResponse = await PostUrlEncodedAndReceiveJson<PhoneNumberResponse>(
+			new Uri("bundle/validate/phone_number/", UriKind.Relative),
+			new Dictionary<string, string>(2) {["phone_number"] = phoneNumber, ["country"] = country});
 
-		ValidateResponse(phoneNumberResponse, nameof(phoneNumberResponse));
-
-		var phone = phoneNumberResponse?.PhoneNumber?.StandardizedNumber ?? '+' + phoneNumber;
+		var phone = phoneNumberResponse?.PhoneNumber?.StandardizedNumber ?? $"+{phoneNumber}";
 
 		return phone;
 	}
 
-	public async Task<string?> SendSMSCodeAndGetTrackID(string phone, string country)
+	public async Task<string> SendSMSCodeAndGetTrackID(string phone, string country)
 	{
-		var trackResponse = await Client.Request("/bundle/yakey_backup/send_code/")
-			.PostUrlEncodedAsync(
-				new
-				{
-					display_language = "en",
-					number = phone,
-					country
-				})
-			.ReceiveJson<TrackResponse?>();
+		var trackResponse = await PostUrlEncodedAndReceiveJson<TrackResponse>(
+			new Uri("bundle/yakey_backup/send_code/", UriKind.Relative),
+			new Dictionary<string, string>(3) {["display_language"] = "en", ["number"] = phone, ["country"] = country});
 
-		if (!ValidateResponse(trackResponse, nameof(trackResponse)))
-		{
-			return null;
-		}
+		ValidateResponse(trackResponse);
 
 		var trackID = trackResponse.TrackID;
 		if (string.IsNullOrEmpty(trackID))
 		{
-			Console.WriteLine("Track ID is empty!");
-
-			return null;
+			throw new InvalidTrackIdException();
 		}
 
 		return trackID;
 	}
 
-	public async Task<string> TryGetCountry()
+	public async Task<string?> TryGetCountry()
 	{
-		var countryResponse = await Client.Request("/suggest/country")
-			.GetAsync()
-			.ReceiveJson<CountryResponse?>();
+		var countryResponse = await _client.GetFromJsonAsync<CountryResponse>(new Uri("suggest/country", UriKind.Relative));
 
-		ValidateResponse(countryResponse, nameof(countryResponse));
-
-		var country = countryResponse?.Country?.FirstOrDefault() ?? "ru";
-
-		return country;
+		return countryResponse?.Country?.FirstOrDefault();
 	}
 
-	public async Task<bool> ValidateBackupInfo(string phone, string? trackID, string country)
+	public async Task ValidateBackupInfo(string phone, string trackID, string country)
 	{
-		var backupInfoResponse = await Client.Request("/bundle/yakey_backup/info/")
-			.PostUrlEncodedAsync(
-				new
-				{
-					number = phone,
-					track_id = trackID,
-					country
-				})
-			.ReceiveJson<BackupInfoResponse?>();
+		var backupInfoResponse = await PostUrlEncodedAndReceiveJson<BackupInfoResponse>(
+			new Uri("bundle/yakey_backup/info/", UriKind.Relative),
+			new Dictionary<string, string>(3) {["number"] = phone, ["track_id"] = trackID, ["country"] = country});
 
-		if (!ValidateResponse(backupInfoResponse, nameof(backupInfoResponse)))
-		{
-			return false;
-		}
+		ValidateResponse(backupInfoResponse);
 
 		if (backupInfoResponse.Info?.Updated == null)
 		{
-			Console.WriteLine("Fatal error - Couldn't find valid backup!");
-
-			return false;
+			throw new NoValidBackupException();
 		}
-
-		return true;
 	}
 
+	private async Task<T?> PostUrlEncodedAndReceiveJson<T>(Uri url, Dictionary<string, string> data)
+	{
+		using var content = new FormUrlEncodedContent(data);
+		using var responseMessage = await _client.PostAsync(url, content);
+		responseMessage.EnsureSuccessStatusCode();
 
-	private static bool ValidateResponse<T>([NotNullWhen(true)] T? response,
-		[CallerArgumentExpression("response")] string responseName = "") where T : StatusResponse
+		return (await responseMessage.Content.ReadFromJsonAsync<T>(_jsonSettings))!;
+	}
+
+	private static void ValidateResponse<T>([NotNull] T? response,
+		[CallerArgumentExpression(nameof(response))] string responseName = "") where T : StatusResponse
 	{
 		if (response == null)
 		{
-			Console.WriteLine(responseName + " failed!");
-
-			return false;
+			throw new ResponseFailedException(responseName);
 		}
 
 		if (!response.IsSuccess)
 		{
-			Console.WriteLine(responseName + $" failed with error {response.Status}!");
-			if (response.Errors != null)
-			{
-				Console.WriteLine("Errors: " + string.Join(',', response.Errors));
-			}
-
-			return false;
+			throw new ResponseFailedException(responseName, response.Status, response.Errors);
 		}
+	}
 
-		return true;
+	public void Dispose()
+	{
+		_client.Dispose();
 	}
 }

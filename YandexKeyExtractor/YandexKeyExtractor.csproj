@@ -1,27 +1,52 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <AssemblyVersion>1.0.0.0</AssemblyVersion>
-        <FileVersion>1.0.0.0</FileVersion>
-        <Nullable>enable</Nullable>
-        <OutputType>Exe</OutputType>
-        <TargetFramework>net8.0</TargetFramework>
-    </PropertyGroup>
+	<PropertyGroup>
+		<AnalysisMode>AllEnabledByDefault</AnalysisMode>
+		<AssemblyVersion>1.1.0</AssemblyVersion>
+		<FileVersion>1.1.0</FileVersion>
+		<NoWarn>$(NoWarn);CA1032;CA2007</NoWarn>
+		<Nullable>enable</Nullable>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net8.0</TargetFramework>
+	</PropertyGroup>
 
-    <!-- Trimming features -->
-    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
-        <DebuggerSupport>false</DebuggerSupport>
-        <EnableUnsafeBinaryFormatterSerialization>false</EnableUnsafeBinaryFormatterSerialization>
-        <EnableUnsafeUTF7Encoding>false</EnableUnsafeUTF7Encoding>
-        <EventSourceSupport>false</EventSourceSupport>
-        <HttpActivityPropagationSupport>false</HttpActivityPropagationSupport>
-        <TrimMode>link</TrimMode>
-    </PropertyGroup>
+	<!-- Trimming features -->
+	<PropertyGroup Condition="'$(Configuration)' == 'Release'">
+		<DebuggerSupport>false</DebuggerSupport>
+		<EnableUnsafeBinaryFormatterSerialization>false</EnableUnsafeBinaryFormatterSerialization>
+		<EnableUnsafeUTF7Encoding>false</EnableUnsafeUTF7Encoding>
+		<EventSourceSupport>false</EventSourceSupport>
+		<HttpActivityPropagationSupport>false</HttpActivityPropagationSupport>
+		<TrimMode>link</TrimMode>
+	</PropertyGroup>
 
-    <ItemGroup>
-        <PackageReference Include="CryptSharpStandard" Version="1.0.0"/>
-        <PackageReference Include="Flurl.Http" Version="4.0.2"/>
-        <PackageReference Include="NaCl.Net" Version="0.1.13"/>
-    </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="CryptSharpStandard" Version="1.0.0"/>
+		<PackageReference Include="NaCl.Net" Version="0.1.13"/>
+	</ItemGroup>
+
+	<ItemGroup>
+		<AssemblyAttribute Include="System.Resources.NeutralResourcesLanguageAttribute">
+			<_Parameter1>en-US</_Parameter1>
+		</AssemblyAttribute>
+		<EmbeddedResource Update="Resources\Localization.resx">
+			<Generator>ResXFileCodeGenerator</Generator>
+			<LastGenOutput>Localization.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+		<Compile Update="Resources\Localization.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>Localization.resx</DependentUpon>
+		</Compile>
+		<EmbeddedResource Update="Resources\Localization.ru-RU.resx">
+			<Generator>ResXFileCodeGenerator</Generator>
+			<LastGenOutput>Localization.ru-RU.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+		<Compile Update="Resources\Localization.ru-RU.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>Localization.ru-RU.resx</DependentUpon>
+		</Compile>
+	</ItemGroup>
 
 </Project>

@@ -5,20 +5,28 @@ using NaCl;
 
 namespace YandexKeyExtractor;
 
-public static class Decryptor
+internal static class Decryptor
 {
+	private const int maxStackallocSize = 4096;
+
 	public static string? Decrypt(string encryptedText, string password)
 	{
 		var base64Text = NormalizeBase64(encryptedText);
 
-		ReadOnlySpan<byte> textBytes = Convert.FromBase64String(base64Text).AsSpan();
+		var textBytes = Convert.FromBase64String(base64Text);
 
 		const byte SaltLength = 16;
-		var textData = textBytes[..^SaltLength];
-		var textSalt = textBytes[^SaltLength..];
+		var textData = textBytes.AsSpan()[..^SaltLength];
+		var salt = textBytes[^SaltLength..];
 
 		var generatedPassword = SCrypt.ComputeDerivedKey(
-			Encoding.UTF8.GetBytes(password), textSalt.ToArray(), 32768, 20, 1, null, 32
+			Encoding.UTF8.GetBytes(password),
+			salt,
+			cost: 32768,
+			blockSize: 20,
+			parallel: 1,
+			maxThreads: null,
+			derivedKeyLength: 32
 		);
 
 		using XSalsa20Poly1305 secureBox = new(generatedPassword);
@@ -27,8 +35,9 @@ public static class Decryptor
 		var nonce = textData[..NonceLength];
 		var dataWithMac = textData[NonceLength..];
 
-
-		var message = dataWithMac.Length <= 4096 ? stackalloc byte[dataWithMac.Length] : new byte[dataWithMac.Length];
+		var message = dataWithMac.Length <= maxStackallocSize
+			? stackalloc byte[dataWithMac.Length]
+			: new byte[dataWithMac.Length];
 
 		const byte MacLength = 16;
 		var data = dataWithMac[MacLength..];
@@ -41,11 +50,27 @@ public static class Decryptor
 
 	private static string NormalizeBase64(string encryptedText)
 	{
-		return encryptedText.Replace('-', '+').Replace('_', '/') + (encryptedText.Length % 4) switch
+		var suffixLength = (encryptedText.Length % 4) switch
 		{
-			2 => "==",
-			3 => "=",
-			_ => ""
+			2 => 2,
+			3 => 1,
+			_ => 0
 		};
+
+		var newLength = encryptedText.Length + suffixLength;
+		var normalized = newLength <= maxStackallocSize / sizeof(char)
+			? stackalloc char[newLength]
+			: new char[newLength];
+
+		encryptedText.CopyTo(normalized);
+		normalized.Replace('-', '+');
+		normalized.Replace('_', '/');
+
+		if (suffixLength > 0)
+		{
+			normalized[^suffixLength..].Fill('=');
+		}
+
+		return new string(normalized);
 	}
 }

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
 namespace YandexKeyExtractor.Models;
@@ -5,5 +6,5 @@ namespace YandexKeyExtractor.Models;
 public class CountryResponse : StatusResponse
 {
 	[JsonPropertyName("country")]
-	public string[]? Country { get; set; }
+	public IReadOnlyCollection<string>? Country { get; set; }
 }

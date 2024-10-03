@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<root>
+    <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+        <xsd:element name="root" msdata:IsDataSet="true">
+
+        </xsd:element>
+    </xsd:schema>
+    <resheader name="resmimetype">
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name="version">
+        <value>1.3</value>
+    </resheader>
+    <resheader name="reader">
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+    <resheader name="writer">
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+    <data name="Initializing" xml:space="preserve">
+        <value>Initializing...</value>
+    </data>
+    <data name="PhoneNumberVariableName" xml:space="preserve">
+        <value>Phone number</value>
+    </data>
+    <data name="PromptVariable" xml:space="preserve">
+        <value>Enter {0}:</value>
+    </data>
+    <data name="InvalidVariableValue" xml:space="preserve">
+        <value>{0} is invalid, try again:</value>
+    </data>
+    <data name="SmsCodeVariableName" xml:space="preserve">
+        <value>SMS code</value>
+    </data>
+    <data name="BackupPasswordVariableName" xml:space="preserve">
+        <value>Backup password</value>
+    </data>
+    <data name="Decrypting" xml:space="preserve">
+        <value>Decrypting...</value>
+    </data>
+    <data name="DecryptionFailed" xml:space="preserve">
+        <value>Decryption failed! Most likely the password is wrong.</value>
+    </data>
+    <data name="Success" xml:space="preserve">
+        <value>Success! Written {0} authenticators to the file (result.txt).</value>
+    </data>
+    <data name="NoValidBackup" xml:space="preserve">
+        <value>Couldn't find a valid backup!</value>
+    </data>
+    <data name="ResponseFailed" xml:space="preserve">
+        <value>Got an error while requesting {0}.</value>
+    </data>
+    <data name="ResponseFailedWithDetails" xml:space="preserve">
+        <value>Got an error status '{0}' while requesting {1}, errors: {2}.</value>
+    </data>
+    <data name="UnknownErrorOccurred" xml:space="preserve">
+        <value>An unknown error occurred: {0}.</value>
+    </data>
+</root>
