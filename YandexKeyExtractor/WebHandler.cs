@@ -6,7 +6,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Runtime.CompilerServices;
-using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
 using System.Threading.Tasks;
 using YandexKeyExtractor.Exceptions;
 using YandexKeyExtractor.Models;
@@ -21,25 +21,22 @@ public sealed class WebHandler : IDisposable
 		BaseAddress = new Uri("https://registrator.mobile.yandex.net/1/")
 	};
 
-	private readonly JsonSerializerOptions _jsonSettings = new()
-	{
-		TypeInfoResolver = SourceGenerationContext.Default
-	};
-
 	public async Task CheckCode(string smsCode, string trackID)
 	{
-		var checkCodeResponse = await PostUrlEncodedAndReceiveJson<StatusResponse>(
+		var checkCodeResponse = await PostUrlEncodedAndReceiveJson(
 			new Uri("bundle/yakey_backup/check_code/", UriKind.Relative),
-			new Dictionary<string, string>(2) {["code"] = smsCode, ["track_id"] = trackID});
+			new Dictionary<string, string>(2) {["code"] = smsCode, ["track_id"] = trackID},
+			static context => context.StatusResponse);
 
 		ValidateResponse(checkCodeResponse);
 	}
 
 	public async Task<string> GetBackupData(string phone, string trackID)
 	{
-		var backupResponse = await PostUrlEncodedAndReceiveJson<BackupResponse>(
+		var backupResponse = await PostUrlEncodedAndReceiveJson(
 			new Uri("bundle/yakey_backup/download", UriKind.Relative),
-			new Dictionary<string, string>(2) {["number"] = phone, ["track_id"] = trackID});
+			new Dictionary<string, string>(2) {["number"] = phone, ["track_id"] = trackID},
+			static context => context.BackupResponse);
 
 		ValidateResponse(backupResponse);
 
@@ -55,7 +52,8 @@ public sealed class WebHandler : IDisposable
 	{
 		var phoneNumberResponse = await PostUrlEncodedAndReceiveJson<PhoneNumberResponse>(
 			new Uri("bundle/validate/phone_number/", UriKind.Relative),
-			new Dictionary<string, string>(2) {["phone_number"] = phoneNumber, ["country"] = country});
+			new Dictionary<string, string>(2) {["phone_number"] = phoneNumber, ["country"] = country},
+			static context => context.PhoneNumberResponse);
 
 		var phone = phoneNumberResponse?.PhoneNumber?.StandardizedNumber ?? $"+{phoneNumber}";
 
@@ -64,9 +62,10 @@ public sealed class WebHandler : IDisposable
 
 	public async Task<string> SendSMSCodeAndGetTrackID(string phone, string country)
 	{
-		var trackResponse = await PostUrlEncodedAndReceiveJson<TrackResponse>(
+		var trackResponse = await PostUrlEncodedAndReceiveJson(
 			new Uri("bundle/yakey_backup/send_code/", UriKind.Relative),
-			new Dictionary<string, string>(3) {["display_language"] = "en", ["number"] = phone, ["country"] = country});
+			new Dictionary<string, string>(3) {["display_language"] = "en", ["number"] = phone, ["country"] = country},
+			static context => context.TrackResponse);
 
 		ValidateResponse(trackResponse);
 
@@ -81,16 +80,18 @@ public sealed class WebHandler : IDisposable
 
 	public async Task<string?> TryGetCountry()
 	{
-		var countryResponse = await _client.GetFromJsonAsync<CountryResponse>(new Uri("suggest/country", UriKind.Relative));
+		var countryResponse = await _client.GetFromJsonAsync(
+			new Uri("suggest/country", UriKind.Relative), SourceGenerationContext.Default.CountryResponse);
 
 		return countryResponse?.Country?.FirstOrDefault();
 	}
 
 	public async Task ValidateBackupInfo(string phone, string trackID, string country)
 	{
-		var backupInfoResponse = await PostUrlEncodedAndReceiveJson<BackupInfoResponse>(
+		var backupInfoResponse = await PostUrlEncodedAndReceiveJson(
 			new Uri("bundle/yakey_backup/info/", UriKind.Relative),
-			new Dictionary<string, string>(3) {["number"] = phone, ["track_id"] = trackID, ["country"] = country});
+			new Dictionary<string, string>(3) {["number"] = phone, ["track_id"] = trackID, ["country"] = country},
+			static context => context.BackupInfoResponse);
 
 		ValidateResponse(backupInfoResponse);
 
@@ -100,13 +101,14 @@ public sealed class WebHandler : IDisposable
 		}
 	}
 
-	private async Task<T?> PostUrlEncodedAndReceiveJson<T>(Uri url, Dictionary<string, string> data)
+	private async Task<T?> PostUrlEncodedAndReceiveJson<T>(Uri url, Dictionary<string, string> data,
+		Func<SourceGenerationContext, JsonTypeInfo<T>> typeInfoProvider)
 	{
 		using var content = new FormUrlEncodedContent(data);
 		using var responseMessage = await _client.PostAsync(url, content);
 		responseMessage.EnsureSuccessStatusCode();
 
-		return (await responseMessage.Content.ReadFromJsonAsync<T>(_jsonSettings))!;
+		return (await responseMessage.Content.ReadFromJsonAsync(typeInfoProvider(SourceGenerationContext.Default)))!;
 	}
 
 	private static void ValidateResponse<T>([NotNull] T? response,
