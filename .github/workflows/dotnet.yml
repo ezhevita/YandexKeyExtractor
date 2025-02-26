@@ -3,7 +3,7 @@ name: .NET
 on: [push, pull_request]
 
 env:
-  DOTNET_SDK_VERSION: 6.0.x
+  DOTNET_SDK_VERSION: 8.0.x
 
 jobs:
   build:
