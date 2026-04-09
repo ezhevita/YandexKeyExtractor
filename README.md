@@ -1,3 +1,8 @@
+> [!IMPORTANT]
+> **Yandex ID app supports exporting to a file, you no longer need to use this project.**
+>
+> **Приложение Yandex ID поддерживает экспорт в файл, использовать данный проект больше не рекомендуется.**
+
 # 🔑 Yandex.Key Extractor
 ## [EN] Extracts TOTP authenticators from [Yandex.Key](https://play.google.com/store/apps/details?id=ru.yandex.key&hl=en&gl=US) app
 
